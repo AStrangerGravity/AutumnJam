@@ -38,11 +38,13 @@ public class Tree : MonoBehaviour {
     protected int current_node = 0;
     protected MeshRenderer[] visible_meshes = new MeshRenderer[n_children];
     protected ClickListener[] child_listeners = new ClickListener[n_children];
+    protected GameObject[] child_nodes = new GameObject[n_children];
     protected ClickListener parent_listener;
+
+    protected GameObject parent_node_instance;
 
     // Use this for initialization
     void Start() {
-
         // Add n_children initial nodes
         CreateSiblingGroup(current_node);
 
@@ -57,14 +59,16 @@ public class Tree : MonoBehaviour {
             GameObject child_node_instance = (GameObject) Instantiate(child_node_prefab, position, Quaternion.identity);
             visible_meshes[i] = child_node_instance.GetComponent<MeshRenderer>();
             child_listeners[i] = child_node_instance.GetComponent<ClickListener>();
+            child_nodes[i] = child_node_instance;
 
         }
 
-        GameObject parent_node_instance = (GameObject) Instantiate(parent_node_prefab, new Vector3(0, 0, depth), Quaternion.identity);
+        parent_node_instance = (GameObject) Instantiate(parent_node_prefab, new Vector3(0, 0, depth), Quaternion.identity);
         parent_listener = parent_node_instance.GetComponent<ClickListener>();
 
         UpdateMeshes(current_node);
 
+        iTween.CameraFadeAdd();
     }
 
     // Update is called once per frame
@@ -90,7 +94,17 @@ public class Tree : MonoBehaviour {
     }
 
     void Ascend() {
+		iTween.MoveTo(Camera.main.gameObject, new Hashtable(){
+            {"position", parent_node_instance.transform.position - new Vector3(0, 0, 20)},
+            {"time", 1f},
+            {"oncomplete", "AfterZoomToParent"},
+            {"oncompletetarget", gameObject }
+        });
 
+        iTween.CameraFadeTo(1, 1);
+    }
+
+    public void AfterZoomToParent() {
         // Move up to the super-tree of the current visible nodes
         int next_node = nodes[current_node].parent_index;
 
@@ -120,10 +134,27 @@ public class Tree : MonoBehaviour {
         // Update meshes to match newly visible nodes
         UpdateMeshes(current_node);
 
+        Camera.main.transform.position = parent_node_instance.transform.position;
+        iTween.CameraFadeTo(0, .25f);
+
+        iTween.MoveTo(Camera.main.gameObject, new Hashtable(){
+            {"position", parent_node_instance.transform.position - new Vector3(0, 0, 8)},
+        });
     }
 
     void Descend(int child) {
+        iTween.MoveTo(Camera.main.gameObject, new Hashtable(){
+            {"position", child_nodes[child].transform.position + new Vector3(0, 0, 1)},
+            {"time", 1f},
+            {"oncomplete", "AfterZoomToChild"},
+            {"oncompleteparams", child },
+            {"oncompletetarget", gameObject }
+        });
 
+        iTween.CameraFadeTo(1, 1);
+    }
+
+    public void AfterZoomToChild(int child) {
         // Move down to the sub-tree of the chosen child
         int next_node = nodes[current_node + child].child_index;
 
@@ -152,6 +183,16 @@ public class Tree : MonoBehaviour {
         // Update meshes to match newly visible nodes
         UpdateMeshes(current_node);
 
+        // Add a slight shift to make it feel like we're coming from the direction
+        // of the node we descended to
+        Vector3 shift = child_nodes[child].transform.position - parent_node_instance.transform.position;
+
+        Camera.main.transform.position = parent_node_instance.transform.position - new Vector3(0, 0, 100) - shift * 10;
+        iTween.CameraFadeTo(0, .25f);
+
+        iTween.MoveTo(Camera.main.gameObject, new Hashtable(){
+            {"position", parent_node_instance.transform.position - new Vector3(0, 0, 8)},
+        });
     }
 
     void CreateSiblingGroup(int start_index, int parent_index = -1) {
