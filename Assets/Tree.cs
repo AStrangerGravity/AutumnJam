@@ -32,7 +32,7 @@ public class Tree : MonoBehaviour {
             case 8: return Color.black;
             case 9: return Color.clear;
             default: return Color.black;
-        }      
+        }
     }
 
     public const int n_children = 20;
@@ -218,7 +218,7 @@ public class Tree : MonoBehaviour {
 
             // 50% change of using the type of the previous node
             if (Random.value > .5f) {
-                t = past_type; 
+                t = past_type;
             }
 
             nodes[start_index + i] = new NodeData(t, -1, parent_index);
