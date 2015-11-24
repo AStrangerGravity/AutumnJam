@@ -9,15 +9,16 @@
     -   id: check-merge-conflict
     -   id: debug-statements
     -   id: detect-private-key
-    -   id: end-of-file-fixer
-    -   id: trailing-whitespace
 -   repo: https://github.com/pricematch/pricematch-pre-commit-hooks
     sha: 751a6d417bc6647552c31b051ed2586eacd460b1
     hooks:
     -   id: do_not_commit
 -   repo: https://github.com/AStrangerGravity/pre-commit-hooks
-    sha: bca98d190fa3df824fa201d768d45dfca41d4a1e
+    sha: dd9237660cdbeb22fb8fb0bfa18d5d625e717ab4
     hooks:
-      -   id: forbid-tabs
-      -   id: remove-tabs
-          args: [--whitespaces-count=2]
+    -   id: end-of-file-fixer
+    -   id: trailing-whitespace
+    -   id: forbid-tabs
+    -   id: remove-tabs
+        args:
+        - --whitespaces-count=2
