@@ -94,7 +94,7 @@ public class Tree : MonoBehaviour {
     }
 
     void Ascend() {
-		iTween.MoveTo(Camera.main.gameObject, new Hashtable(){
+    iTween.MoveTo(Camera.main.gameObject, new Hashtable(){
             {"position", parent_node_instance.transform.position - new Vector3(0, 0, 20)},
             {"time", 1f},
             {"oncomplete", "AfterZoomToParent"},

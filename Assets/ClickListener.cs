@@ -3,23 +3,23 @@ using System.Collections;
 
 public class ClickListener : MonoBehaviour {
 
-	protected bool clicked = false;
+  protected bool clicked = false;
 
-	void OnMouseDown() {
+  void OnMouseDown() {
 
-		clicked = true;
+    clicked = true;
 
-	}
+  }
 
-	public bool Clicked(bool reset = true) {
+  public bool Clicked(bool reset = true) {
 
-		bool c = clicked;
+    bool c = clicked;
 
-		if (reset) {
-			clicked = false;
-		}
+    if (reset) {
+      clicked = false;
+    }
 
-		return c;
+    return c;
 
-	}
+  }
 }
