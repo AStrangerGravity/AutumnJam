@@ -20,19 +20,23 @@ public class Tree : MonoBehaviour {
     }
 
     public Color ColorForNodeType(int type) {
-        
         switch (type) {
             case 0: return Color.red;
             case 1: return Color.yellow;
             case 2: return Color.green;
             case 3: return Color.magenta;
-        }
-        return Color.black;
-        
+            case 4: return Color.blue;
+            case 5: return Color.cyan;
+            case 6: return Color.white;
+            case 7: return Color.grey;
+            case 8: return Color.black;
+            case 9: return Color.clear;
+            default: return Color.black;
+        }      
     }
 
-    public const int n_children = 3;
-    public const int n_types = 4;
+    public const int n_children = 20;
+    public const int n_types = 5;
 
     protected List<NodeData> nodes = new List<NodeData>();
     protected int current_node = 0;
@@ -46,14 +50,14 @@ public class Tree : MonoBehaviour {
     // Use this for initialization
     void Start() {
         // Add n_children initial nodes
-        CreateSiblingGroup(current_node);
+        CreateSiblingGroup(current_node, null);
 
         // Initialize meshes
         float depth = 7;
         for (int i = 0; i < n_children; ++i) {
 
             float angle = 2 * Mathf.PI * i / (float) n_children;
-            float radius = 3;
+            float radius = 3f;
             Vector3 position = new Vector3(radius * Mathf.Sin(angle), radius * Mathf.Cos(angle), depth);
 
             GameObject child_node_instance = (GameObject) Instantiate(child_node_prefab, position, Quaternion.identity);
@@ -89,7 +93,7 @@ public class Tree : MonoBehaviour {
             Ascend();
         }
 
-        RotateMeshes(Time.deltaTime);
+        //RotateMeshes(Time.deltaTime);
 
     }
 
@@ -112,7 +116,7 @@ public class Tree : MonoBehaviour {
 
             // Create new nodes at the super-tree
             next_node = nodes.Count;
-            CreateSiblingGroup(next_node);
+            CreateSiblingGroup(next_node, null);
 
             // Choose a random position for the parent among its siblings
             next_node += Random.Range(0, n_children);
@@ -166,7 +170,7 @@ public class Tree : MonoBehaviour {
 
             do {
 
-                CreateSiblingGroup(next_node);
+                CreateSiblingGroup(next_node, current_type);
 
             } while (ParentNodeType(next_node) != current_type);
 
@@ -195,7 +199,7 @@ public class Tree : MonoBehaviour {
         });
     }
 
-    void CreateSiblingGroup(int start_index, int parent_index = -1) {
+    void CreateSiblingGroup(int start_index, int? ideal_type, int parent_index = -1) {
 
         // Ensure the node list has enough members to initialize n_children nodes
         // starting at the given position
@@ -208,9 +212,18 @@ public class Tree : MonoBehaviour {
         }
 
         // Initialize n_children nodes starting at the given position
+        int past_type = Random.Range(0, n_types);
         for (int i = 0; i < n_children; ++i) {
+            int t = Random.Range(0, n_types);
 
-            nodes[start_index + i] = new NodeData(Random.Range(0, n_types), -1, parent_index);
+            // 50% change of using the type of the previous node
+            if (Random.value > .5f) {
+                t = past_type; 
+            }
+
+            nodes[start_index + i] = new NodeData(t, -1, parent_index);
+
+            past_type = t;
 
         }
 
