@@ -1,0 +1,23 @@
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    sha: 0ff8620e03bf7acfb4dfdc86de14baf032c604f5
+    hooks:
+    -   id: check-yaml
+    -   id: check-json
+    -   id: pretty-format-json
+    -   id: check-case-conflict
+    -   id: check-added-large-files
+    -   id: check-merge-conflict
+    -   id: debug-statements
+    -   id: detect-private-key
+    -   id: end-of-file-fixer
+    -   id: trailing-whitespace
+-   repo: https://github.com/pricematch/pricematch-pre-commit-hooks
+    sha: 751a6d417bc6647552c31b051ed2586eacd460b1
+    hooks:
+    -   id: do_not_commit
+-   repo: https://github.com/AStrangerGravity/pre-commit-hooks
+    sha: bca98d190fa3df824fa201d768d45dfca41d4a1e
+    hooks:
+      -   id: forbid-tabs
+      -   id: remove-tabs
+          args: [--whitespaces-count=2]
