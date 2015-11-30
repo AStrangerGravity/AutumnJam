@@ -1,10 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 public class Tree : MonoBehaviour {
     // (0...1): Chance of next type in generated layer following the previous generated type.
-    private readonly float HOMOGENITY = .8f;
+    private const float HOMOGENITY = .8f;
 
     public const int n_children = 8;
     public const int n_types = 10;
@@ -14,29 +16,25 @@ public class Tree : MonoBehaviour {
     protected GameObject[] child_nodes = new GameObject[n_children];
     protected int current_node;
 
+    private readonly NodeType[] node_types = {
+        new NodeType {color = Color.green, weight = 30f},
+        new NodeType {color = Color.blue, weight = 8f},
+        new NodeType {color = Color.yellow, weight = 0f},
+        new NodeType {color = Color.red, weight = 0f},
+        new NodeType {color = Color.magenta, weight = 0f},
+        new NodeType {color = Color.cyan, weight = .3f},
+        new NodeType {color = Color.white, weight = .6f},
+        new NodeType {color = Color.grey, weight = 0f},
+        new NodeType {color = Color.black, weight = .3f},
+        new NodeType {color = Color.clear, weight = 0f},
+    };
+
     protected List<NodeData> nodes = new List<NodeData>();
     protected ClickListener parent_listener;
 
     protected GameObject parent_node_instance;
     public GameObject parent_node_prefab;
     protected MeshRenderer[] visible_meshes = new MeshRenderer[n_children];
-
-    public Color ColorForNodeType(int type) {
-        switch (type) {
-            case 0: return Color.red;
-            case 1: return Color.yellow;
-            case 2: return Color.green;
-            case 3: return Color.magenta;
-            case 4: return Color.blue;
-            case 5: return Color.cyan;
-            case 6: return Color.white;
-            case 7: return Color.grey;
-            case 8: return Color.black;
-            case 9: return Color.clear;
-            default:
-                return Color.black;
-        }
-    }
 
     // Use this for initialization
     private void Start() {
@@ -54,14 +52,13 @@ public class Tree : MonoBehaviour {
             //Vector3 position = new Vector3(radius * Mathf.Sin(angle), radius * Mathf.Cos(angle), depth);
             const float spacing = 1.5f;
             int row_size = Mathf.CeilToInt(Mathf.Sqrt(n_children));
-            float offset = -(spacing * (row_size-1)) / 2f;
+            float offset = -(spacing * (row_size - 1)) / 2f;
             int x = i % row_size;
             int y = i / row_size;
 
-            if (x == row_size/2 && y == row_size/2) {
+            if (x == row_size / 2 && y == row_size / 2) {
                 continue;
             }
-
 
             Vector3 position = new Vector3(offset + spacing * x, offset + spacing * y, depth);
 
@@ -208,9 +205,9 @@ public class Tree : MonoBehaviour {
         }
 
         // Initialize n_children nodes starting at the given position
-        int past_type = Random.Range(0, n_types);
+        int past_type = GetRandomWeightedNodeType();
         for (int i = 0; i < n_children; ++i) {
-            int t = Random.Range(0, n_types);
+            int t = GetRandomWeightedNodeType();
 
             // 50% change of using the type of the previous node
             if (Random.value < HOMOGENITY) {
@@ -221,6 +218,20 @@ public class Tree : MonoBehaviour {
 
             past_type = t;
         }
+    }
+
+    private int GetRandomWeightedNodeType() {
+        float cumulative = node_types.Select(item => item.weight).Sum();
+
+        float choice = Random.value * cumulative;
+        for (int i = 0; i < node_types.Length; i++) {
+            if (choice <= node_types[i].weight) {
+                return i;
+            }
+            choice -= node_types[i].weight;
+        }
+
+        throw new AssertionException("Algorithm should always terminate. Error.", "");
     }
 
     private void SetParentIndex(int index, int parent_index) {
@@ -248,6 +259,9 @@ public class Tree : MonoBehaviour {
             int type = nodes[start_index + i].type;
             ++counts[type];
         }
+
+        // var test = nodes.GroupBy(n => n.type, n => 1, (key, g) => g.Sum());
+        // test.Ma
 
         // Find the types with the highest and lowest counts
         int highest_type = 0;
@@ -279,7 +293,7 @@ public class Tree : MonoBehaviour {
 
     private void UpdateMeshes(int index) {
         for (int i = 0; i < visible_meshes.Length; ++i) {
-            Color color = ColorForNodeType(nodes[index + i].type);
+            Color color = node_types[nodes[index + i].type].color;
 
             MeshRenderer mesh = visible_meshes[i];
             mesh.material.color = color;
@@ -292,6 +306,13 @@ public class Tree : MonoBehaviour {
         foreach (MeshRenderer mesh in visible_meshes) {
             mesh.transform.Rotate(delta_angle, delta_angle, 0);
         }
+    }
+
+    private struct NodeType {
+        public Color color;
+
+        // The relative likelihood that this type is chosen
+        public float weight;
     }
 
     public struct NodeData {
