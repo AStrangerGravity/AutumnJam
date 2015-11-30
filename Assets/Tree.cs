@@ -6,7 +6,7 @@ public class Tree : MonoBehaviour {
     // (0...1): Chance of next type in generated layer following the previous generated type.
     private readonly float HOMOGENITY = .8f;
 
-    public const int n_children = 8; 
+    public const int n_children = 8;
     public const int n_types = 10;
     protected ClickListener[] child_listeners = new ClickListener[n_children];
 
