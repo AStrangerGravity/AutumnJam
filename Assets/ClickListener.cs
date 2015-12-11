@@ -1,11 +1,10 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public class ClickListener : MonoBehaviour {
 
   protected bool clicked = false;
 
-  void OnMouseDown() {
+  public void OnMouseDown() {
 
     clicked = true;
 
