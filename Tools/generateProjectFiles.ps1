@@ -10,5 +10,5 @@ $project_dir = Join-Path $tools_dir "/../" -resolve
 
 # Query the assembly function to generate the project
 $exitCode = [Diagnostics.Process]::Start("C:\Program Files\Unity\Editor\Unity.exe", 
-    "-batchmode -logFile -projectPath $tools_dir -executeMethod SyntaxTree.VisualStudio.Unity.Bridge.ProjectFilesGenerator.GenerateProject -quit").WaitForExit(60000) # Wait for 60 seconds
+    "-batchmode -logFile -projectPath $project_dir -executeMethod SyntaxTree.VisualStudio.Unity.Bridge.ProjectFilesGenerator.GenerateProject -quit").WaitForExit(60000) # Wait for 60 seconds
 
